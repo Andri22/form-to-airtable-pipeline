@@ -1,0 +1,260 @@
+{
+  "name": "Form to Airtable + Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tally-leads-airtable",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "35a2d4b6-b2ec-4690-a245-ea9ee40d9a5b",
+      "name": "Webhook",
+      "webhookId": "4b1ad040-58aa-43b0-bf4a-777a4d978d72"
+    },
+    {
+      "parameters": {
+        "chatId": "-1003764865065",
+        "text": "=🔔 New Lead Received!  \n\n👤 Name     : {{ $json.name }} \n📧 Email    : {{ $json.email }} \n🏢 Company  : {{ $json.company }} \n🛠 Service  : {{ $json.service }} \n💬 Message  : {{ $json.message }}  \n\nCheck Notion for full details.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        416,
+        176
+      ],
+      "id": "d95d179a-3082-49e4-a8fd-5abc0ab4637a",
+      "name": "Send a text message",
+      "webhookId": "cd708dfb-f08c-447f-b2b3-aa93aba3dd3c",
+      "credentials": {
+        "telegramApi": {
+          "id": "0xGj13wxaYd1MaMK",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fields = $input.first().json.body.data.fields;\n\nconst name = fields[0].value;\nconst email = fields[1].value;\nconst company = fields[2].value;\nconst message = fields[4].value;\n\n// Match dropdown ID to text\nconst dropdownField = fields[3];\nconst selectedId = dropdownField.value[0];\nconst selectedOption = dropdownField.options.find(o => o.id === selectedId);\nconst service = selectedOption ? selectedOption.text : 'Unknown';\n\nreturn [{\n  json: {\n    name,\n    email,\n    company,\n    service,\n    message,\n    submitted_at: new Date().toISOString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "85c95d31-266c-4017-aed4-ab02c215be6d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "apprjNAS7SgHfZcST",
+          "mode": "list",
+          "cachedResultName": "Client Leads",
+          "cachedResultUrl": "https://airtable.com/apprjNAS7SgHfZcST"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbliOH0BPp7XyymdR",
+          "mode": "list",
+          "cachedResultName": "Client Leads",
+          "cachedResultUrl": "https://airtable.com/apprjNAS7SgHfZcST/tbliOH0BPp7XyymdR"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Company": "={{ $json.company }}",
+            "Message": "={{ $json.message }}",
+            "Status": "New",
+            "Submitted At": "={{ $json.submitted_at }}",
+            "Service Needed": "={{ $json.service }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Service Needed",
+              "displayName": "Service Needed",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "AI Bot",
+                  "value": "AI Bot"
+                },
+                {
+                  "name": "Automation",
+                  "value": "Automation"
+                },
+                {
+                  "name": "Reporting",
+                  "value": "Reporting"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "New",
+                  "value": "New"
+                },
+                {
+                  "name": "Contacted",
+                  "value": "Contacted"
+                },
+                {
+                  "name": "Closed",
+                  "value": "Closed"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Submitted At",
+              "displayName": "Submitted At",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7b3428b4-a8ab-4f44-970a-c380a0d9f866",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "cuGusWkfPoiL0cPm",
+          "name": "Airtable Personal Access Token account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "99e783a9-476a-4348-be48-37970b6602d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ab4da710a8e5e399600a494b56823a58c73a4cfb4b7d4aa1a9b2cd8cfec75e18"
+  },
+  "id": "aNy94UZxXmxPcmZv",
+  "tags": []
+}
