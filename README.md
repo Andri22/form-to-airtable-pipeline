@@ -35,4 +35,4 @@ and organize client inquiries without manual copy-pasting.
 ## Result
 - Zero leads lost — every submission captured automatically
 - Business owner notified within seconds of submission
-- Clean Notion database for tracking lead status
+- Clean Airtable database for tracking lead status
